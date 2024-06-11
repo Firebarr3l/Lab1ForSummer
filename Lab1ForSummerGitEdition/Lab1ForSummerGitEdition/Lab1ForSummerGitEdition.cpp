@@ -160,3 +160,111 @@ printf("Студия %s выпустила всего: %d игр",vvodstudio, k);
 getch();
 }
 
+// Функция вставки информации о студиях в связанный список
+void vstavka(struct steamcopy* steamstudio,char* studioname, int chislostrok) 
+{ 
+int i; 
+struct sp *nov,*nt,*z=0; 
+for(nt=spisok; nt!=0 && strcmp(nt->studioname,studioname)<0; z=nt, nt=nt->sled); 
+if(nt && strcmp(nt->studioname,studioname)==0) return; 
+nov=(struct sp *) malloc(sizeof(struct sp)); 
+strcpy(nov->studioname,studioname); 
+nov->sled=nt; 
+nov->prodcopy=0;
+nov->online=0;
+nov->pred = z;
+for(i=0;i<chislostrok;i++){
+	if(strcmp(steamstudio[i].studioname,studioname)==0){ 
+		nov->prodcopy+=steamstudio[i].prodcopy;
+		nov->online+=steamstudio[i].online;}
+}
+if(!z) spisok=nov; 
+if(z) z->sled=nov; 
+if(nt) nt->pred=nov; 
+return; 
+}
+
+// Функция вставки информации об играх в связанный список
+void vstavkagames(struct steamcopy* steamgames,char* name, int chislostrok) 
+{ 
+int i; 
+struct sp2 *nov,*nt,*z=0; 
+for(nt=spisok2; nt!=0 && strcmp(nt->name,name)<0; z=nt, nt=nt->sled); 
+if(nt && strcmp(nt->name,name)==0) return; 
+nov=(struct sp2 *) malloc(sizeof(struct sp2)); 
+strcpy(nov->name,name); 
+nov->sled=nt; 
+nov->prodcopy=0;
+nov->online=0;
+nov->cost=0;
+strcpy(nov->studioname,"");
+strcpy(nov->data,"");
+nov->pred = z;
+for(i=0;i<chislostrok;i++){ 
+	if(strcmp(steamgames[i].name,name)==0){ 
+		nov->prodcopy+=steamgames[i].prodcopy;
+		nov->online+=steamgames[i].online;
+		nov->cost+=steamgames[i].cost;
+		strcat(nov->studioname, steamgames[i].studioname);
+		strcat(nov->data, steamgames[i].data);}
+}
+if(!z) spisok2=nov; 
+if(z) z->sled=nov; 
+if(nt) nt->pred=nov; 
+return; 
+}
+// Функция отображения алфавитного списка игр и их информации
+void alfalistgames(struct steamcopy* steam, int chislostrok)
+{
+int i;
+char s[17];
+struct sp2 *nt;
+Console::ForegroundColor=ConsoleColor::Yellow;
+Console::BackgroundColor=ConsoleColor::DarkMagenta;
+Console::Clear();
+if(!spisok2){
+	for(i=0;i<chislostrok;i++){
+		vstavkagames(steam,steam[i].name, chislostrok);}
+}
+Console::Clear();
+printf("\n \t\t\t\t\t\tАлфавитный список игр");
+printf("\n ======================================================================================================================");
+printf("\n Название игры                    Цена       Онлайн     Прод. копии    Название студии           Дата");
+printf("\n ======================================================================================================================");
+for(nt=spisok2; nt!=0; nt=nt->sled){
+	text_data(s,nt->data);
+	printf("\n %-31s %5ld %12ld %15ld    %-18s   %-17s",nt->name,nt->cost,nt->online, nt->prodcopy, nt->studioname, s);}
+getch();
+}
+
+
+
+
+// Функция отображения алфавитного и обратного списка студий и суммарное кол-во проданных копий игр этой студии
+void alfalist(struct steamcopy* steam,int chislostrok)
+{
+int i;
+struct sp *nt,*z;
+Console::ForegroundColor=ConsoleColor::Yellow;
+Console::BackgroundColor=ConsoleColor::DarkMagenta;
+Console::Clear();
+printf("\n    Алфавитный список студий");
+printf(" \t\t\t\t   Обратный алфавитный список студий");
+printf("\n========================================================================================================================");
+if(!spisok){
+	for(i=0;i<chislostrok;i++){
+		vstavka(steam,steam[i].studioname, chislostrok);}
+}
+for(nt=spisok; nt!=0; nt=nt->sled){
+	printf("\n %-20s %10ld",nt->studioname,nt->prodcopy);}
+for(nt=spisok,z=0; nt!=0; z=nt,nt=nt->sled);{
+	Console::CursorTop=3;
+	for(nt=z; nt!=0; nt=nt->pred){
+		Console::CursorLeft=60;
+		printf("%-20s %10ld",nt->studioname,nt->prodcopy);
+		Console::CursorTop+=1;}
+}
+getch();
+}
+
+
