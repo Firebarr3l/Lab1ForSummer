@@ -321,3 +321,119 @@ getch();
 } 
 
 
+//Функция отображающая диаграмму проданных копий по студии
+void diagramstudio(struct steamcopy *steam, int chislostrok)
+{
+struct sp* nt;
+int len,i,NColor;
+long copy = 0;
+char str1[200];
+char str2[200];
+System::ConsoleColor Color;
+Console::BufferHeight=720;
+Console::BufferWidth=1280;
+Console::ForegroundColor=ConsoleColor::Yellow;
+Console::BackgroundColor=ConsoleColor::DarkMagenta;
+Console::Clear();
+for(i=0;i<chislostrok;i++)copy = copy+steam[i].prodcopy;
+if(!spisok){
+	for(i=0;i<chislostrok;i++){
+		vstavka(steam, steam[i].studioname, chislostrok);}
+}
+printf("          Диаграмма проданных копий игр определенной студии");
+printf("\n============================================================================");
+Color=ConsoleColor::DarkYellow; NColor=7;
+for(nt=spisok,i=1; nt!=0; nt=nt->sled,i++){
+sprintf(str1,"%s",nt->studioname);
+sprintf(str2,"%3.1f%%",(nt->prodcopy*100./copy));
+Console::ForegroundColor=ConsoleColor::Yellow;
+Console::BackgroundColor= ConsoleColor::DarkMagenta;
+Console::CursorLeft=0; Console::CursorTop=i+1;
+printf(str1);
+Console::CursorLeft=17;
+printf("%s",str2);
+Console::BackgroundColor=++Color;NColor++;
+Console::CursorLeft=23;
+for(len=0; len<(nt->prodcopy*100)/copy; len++) 
+	printf(" ");
+	if(NColor==13){
+		Color=ConsoleColor::DarkYellow; NColor=7;}
+
+}
+getch();
+return ;
+}
+
+
+//Функция отображающая процентное соотношения онлайна в играх
+void diagramgames(struct steamcopy *steam,int chislostrok) 
+{ 
+struct sp2* nt; 
+int len,i,NColor; 
+long sum1 = 0 ; 
+long sum; 
+char str1[200]; 
+char str2[200]; 
+System::ConsoleColor Color; 
+Console::ForegroundColor=ConsoleColor::Yellow; 
+Console::BackgroundColor=ConsoleColor::DarkMagenta; 
+Console::Clear(); 
+for(i=0;i<chislostrok;i++) sum1 = sum1+steam[i].online; 
+sum=sum1/chislostrok; 
+if(!spisok2){ 
+	for(i=0;i<chislostrok;i++){ 
+		vstavkagames(steam,steam[i].name, chislostrok);}
+}
+Color=ConsoleColor::DarkYellow; NColor=7; 
+Console::BackgroundColor=ConsoleColor::DarkMagenta; 
+Console::ForegroundColor=ConsoleColor::Cyan; 
+printf("Cр. знач. онлайна в играх (%d)   100%%  ",sum);
+Console::BackgroundColor=ConsoleColor::Cyan; 
+Console::CursorLeft=55; 
+for(len=0; len<25; len++)printf(" ");
+Console::BackgroundColor=ConsoleColor::DarkMagenta; 
+Console::ForegroundColor=ConsoleColor::Yellow;
+printf("\n========================================================================================================================================================================="); 
+for(nt=spisok2,i=1; nt!=0; nt=nt->sled,i++) { 
+sprintf(str1,"%s",nt->name); 
+sprintf(str2,"%3.1f%%",(nt->online*100./sum)); 
+Console::ForegroundColor=ConsoleColor::Yellow; 
+Console::BackgroundColor= ConsoleColor::DarkMagenta; 
+Console::CursorLeft=0; Console::CursorTop=i+1; 
+printf(str1); 
+Console::CursorLeft=35; 
+printf("%-s",str2);
+Console::BackgroundColor=++Color;NColor++;
+Console::CursorLeft=44;
+for(len=0; len<(nt->online)*10/sum; len++) printf(" "); 
+	if(NColor==12){ 
+		Color=ConsoleColor::DarkYellow; NColor=7;} 
+} 
+getch(); 
+return ; 
+}
+
+//Сложный вопрос. Ищет соответствие между двумя студиями
+void CompereCostofgames(struct steamcopy* steam, int chislostrok)
+{
+int i, j, proverka=0;
+Console::ForegroundColor=ConsoleColor::Yellow; 
+Console::BackgroundColor=ConsoleColor::DarkGray; 
+Console::CursorTop=15;
+Console::CursorLeft=10;
+for (i = 0; i < chislostrok - 1; i++) {
+	for (j = i + 1; j < chislostrok; j++) {
+		if (steam[i].cost == steam[j].cost) {
+			proverka=1;
+			Console::CursorLeft=10;
+			printf("Игры %s (%s) и %s (%s) стоит одинаково: %ld руб.\n", steam[i].name, steam[i].studioname, steam[j].name,steam[j].studioname, steam[i].cost);
+			Console::CursorTop+=1;}
+		
+	}
+break;}
+if (!proverka){
+	printf("Игр с одинаковыми ценами нет!");}
+getch();
+}
+
+
