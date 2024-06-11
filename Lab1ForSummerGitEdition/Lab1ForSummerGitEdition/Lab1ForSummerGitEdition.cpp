@@ -84,3 +84,79 @@ strncat(s,sd,4);
 return;
 }
 
+// Функция нахождения игры с наименьшим числом проданных копий
+void minn(struct steamcopy* steam,int chislostrok)
+{
+int i=0;
+struct steamcopy best;
+strcpy(best.name,steam[0].name);
+best.prodcopy=steam[0].prodcopy;
+for(i=1;i<chislostrok;i++){
+	if (steam[i].prodcopy<best.prodcopy){
+		strcpy(best.name,steam[i].name);
+		best.prodcopy=steam[i].prodcopy;}
+}
+Console::ForegroundColor=ConsoleColor::Yellow;
+Console::BackgroundColor=ConsoleColor::DarkGray;
+Console::CursorLeft=10;
+Console::CursorTop=15;
+printf("Наименьшее число %ld проданных копий",best.prodcopy);
+Console::CursorLeft=10;
+Console::CursorTop=17;
+printf("имеет игра: %s",best.name);
+getch();
+}
+
+
+// Функция нахождения самой старой игры
+void oldest(struct steamcopy* steam, int chislostrok)
+{
+int i;
+char s[17];
+struct steamcopy* best=steam;
+for(i=1;i<chislostrok;i++){
+	if (strcmp(steam[i].data,best->data)<0){
+		best=&steam[i];}
+}
+text_data(s,best->data);
+Console::ForegroundColor=ConsoleColor::Yellow;
+Console::BackgroundColor=ConsoleColor::DarkGray;
+Console::CursorLeft=10;
+Console::CursorTop=15;
+printf("Самая \"старая\" игра принадлежит студии %s ",best->studioname);
+Console::CursorLeft=10;
+Console::CursorTop=17;
+printf("это %s",best->name);
+Console::CursorLeft=10;
+Console::CursorTop=19;
+printf("Была выпущенна %s ",s);
+getch();
+}
+
+// Функция подсчета количества игр определенной студии
+void kolvoigr(struct steamcopy *steam, int chislostrok)
+{
+int i,k=0;
+char vvodstudio[18];
+Console::ForegroundColor=ConsoleColor::Yellow;
+Console::BackgroundColor=ConsoleColor::DarkGray;
+Console::CursorLeft=10;
+Console::CursorTop=15;
+printf("Введите название студии, чтобы увидеть количество ее игр");
+SetConsoleCP(1251);
+Console::CursorLeft=10;
+Console::CursorTop=17;
+scanf("%s", vvodstudio);
+SetConsoleCP(866);
+for(i=0;i<chislostrok;i++){
+	if (strcmp(steam[i].studioname,vvodstudio)==0){
+		k++;}
+}
+Console::ForegroundColor=ConsoleColor::Yellow;
+Console::BackgroundColor=ConsoleColor::DarkGray;
+Console::CursorLeft=10;
+Console::CursorTop=19;
+printf("Студия %s выпустила всего: %d игр",vvodstudio, k);
+getch();
+}
+
