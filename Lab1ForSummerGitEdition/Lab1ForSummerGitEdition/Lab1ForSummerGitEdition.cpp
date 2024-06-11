@@ -437,3 +437,127 @@ getch();
 }
 
 
+
+
+
+
+
+//Главная программа
+int main(array<System::String ^> ^args)  
+{
+	//Список вопросов
+char dan[][LENGTHMENU] = {  
+"У какой игры меньше всего проданных копий?               ", 
+"Самая старая игра.                                       ",  
+"Количество выпущенных игр определенной студии по запросу.",  
+"Алфавитный список студий и обратный алфавитный список.   ",  
+"Алфавитный список игр, со всей информацией.              ",  
+"Запрос по студии, минимальному онлайну и цене.           ",
+"Диаграмма. Процентное соотношение онлайна в играх.       ",
+"Диаграмма. Процентноу соотношения проданных копий.       ",
+"Поиск одинаковых цен игр.                                ",
+"Вернуться на предыдущую страницу                         ",
+"Выход                                                    ",};
+int i, n;  
+FILE *in;  
+struct steamcopy *steam;
+int chislostrok;
+point1:;// Точка для возращения на предыдущую страницу
+setlocale(LC_CTYPE, "Russian");// Локализация  
+Console::CursorVisible::set(false);//Невидимый курсор  
+//Установка размерров окна
+Console::BufferHeight = 720; 
+Console::BufferWidth = 1280;
+//Открытие файла с проверкой его открытия
+if ((in = fopen("CopySteam.dat", "r")) == NULL){
+		printf("\nФайл CopySteam.dat не открыт!");
+		getch(); exit(1);}
+//Создание Таблицы данных
+Console::BackgroundColor=ConsoleColor::Black; 
+Console::ForegroundColor=ConsoleColor::Cyan; 
+printf("\nНазвание игры                    Цена   Проданых копий      Онлайн Название студии    Дата выпуска");
+Console::BackgroundColor=ConsoleColor::Black; 
+Console::ForegroundColor=ConsoleColor::White;
+fscanf(in, "%d", &chislostrok);//Считывание количество строк
+steam = (struct steamcopy*)malloc(chislostrok * sizeof(struct steamcopy));
+//Считывание данных из файла
+for (i = 0; i < chislostrok; i++){
+	fscanf(in, "%s%ld%ld%ld%s%s", steam[i].name, &steam[i].cost, &steam[i].prodcopy, &steam[i].online, steam[i].studioname, steam[i].data);}
+//Печать данных из файла по заданным стандартам
+for (i = 0; i < chislostrok; i++){
+	printf("\n%-31s %5ld %12ld %15ld %-18s %s", steam[i].name, steam[i].cost, steam[i].prodcopy, steam[i].online, steam[i].studioname, steam[i].data);}
+Console::BackgroundColor=ConsoleColor::Black; 
+Console::ForegroundColor=ConsoleColor::Cyan;
+printf("\n");
+printf("\n");
+printf("\n");
+printf("\nДля перехода на следующую страницу нажмите ENTER                                                                    "); 
+getch();
+while (1)  {  
+	Console::ForegroundColor = ConsoleColor::Yellow;  
+	Console::BackgroundColor = ConsoleColor::DarkGray;  
+	Console::Clear();
+	Console::ForegroundColor = ConsoleColor::Yellow;  
+	Console::BackgroundColor = ConsoleColor::DarkMagenta;  
+	Console::CursorLeft = 10;  
+	Console::CursorTop = 1;  
+	printf("                                                           ");  //Печать вопросов
+	for (i = 0; i < 12; i++){  
+		Console::CursorLeft = 10;  
+		Console::CursorTop = i + 2;  
+		printf(" %s ", dan[i]);}  
+	Console::CursorLeft = 10;  
+	Console::CursorTop = 13;
+	printf("                                                           ");  
+n = menu(11, dan); //Использование функции меню и открытие подпрограм через функцию меню 
+switch (n) {  
+	case 1: minn(steam, chislostrok); break;//Использование функций(подпрограмм описаных в начале  
+	case 2: oldest(steam, chislostrok);break;  
+	case 3: kolvoigr(steam,chislostrok);break;  
+	case 4: alfalist(steam, chislostrok);break;  
+	case 5: alfalistgames(steam, chislostrok);break;  
+	case 6: listing(steam, chislostrok);break;
+	case 7: diagramgames(steam, chislostrok);break;
+	case 8: diagramstudio(steam, chislostrok);break;
+	case 9: CompereCostofgames(steam, chislostrok); break;
+	case 10:{Console::CursorLeft=0; 
+Console::BackgroundColor=ConsoleColor::Black; 
+Console::ForegroundColor=ConsoleColor::White; 
+Console::CursorTop=0; 
+Console::Clear(); 
+goto point1;} 
+	case 11: exit(0);  
+		}  
+}  
+  
+return 0;  
+}  
+  
+int menu(int n,char dan[][LENGTHMENU])  //Функция меню
+{  
+
+int y1 = 0, y2 = n - 1;  
+char c = 1;  
+while (c != ESC){  
+	switch (c) {
+		case DOWN: y2 = y1; y1++; break;  
+		case UP: y2 = y1; y1--; break;
+		case ENTER: return y1 + 1;
+		case HOME: y2=y1; y1=0; break;
+		case END: y2=y1; y1=n-1; break;}
+ 
+	if (y1 > n - 1) { y2 = n - 1; y1 = 0; }  
+	if (y1 < 0) { y2 = 0; y1 = n - 1; }
+	Console::ForegroundColor = ConsoleColor::Yellow;  
+	Console::BackgroundColor = ConsoleColor::DarkMagenta;  
+	Console::CursorLeft = 11;  
+	Console::CursorTop = y2 + 2;  
+	printf("%s", dan[y2]);
+	Console::ForegroundColor = ConsoleColor::Black;  
+	Console::BackgroundColor = ConsoleColor::DarkGreen;  
+	Console::CursorLeft = 11;  
+	Console::CursorTop = y1 + 2;  
+	printf("%s", dan[y1]);      
+	c = getch();}   
+exit(0);
+}
