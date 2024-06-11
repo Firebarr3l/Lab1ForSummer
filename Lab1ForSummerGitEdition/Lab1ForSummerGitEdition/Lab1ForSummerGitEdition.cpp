@@ -267,4 +267,57 @@ for(nt=spisok,z=0; nt!=0; z=nt,nt=nt->sled);{
 getch();
 }
 
+//Поиск игр по названию студии минимальному количеству онлайна и цены
+void listing(struct steamcopy* steam,int chislostrok) 
+{ 
+int orn, price, i; 
+char vvodstudio[18];
+struct sp2 *net;
+if(!spisok2){
+	for(i=0;i<chislostrok;i++){
+		vstavkagames(steam,steam[i].name, chislostrok);}
+}
+Console::Clear();
+Console::ForegroundColor=ConsoleColor::Yellow; 
+Console::BackgroundColor=ConsoleColor::DarkMagenta; 
+Console::Clear();
+Console::CursorLeft=0;
+Console::CursorTop=1;
+printf("Введите название студии: ");
+SetConsoleCP(1251);
+Console::CursorLeft=27;
+Console::CursorTop=1;
+scanf("%s", vvodstudio);
+SetConsoleCP(866);
+Console::CursorLeft=0;
+Console::CursorTop=3;
+printf("Введите минимальный онлайн в игре: ");
+SetConsoleCP(1251);
+Console::CursorLeft=36;
+Console::CursorTop=3;
+scanf("%d", &orn);
+SetConsoleCP(866);
+Console::CursorLeft=0;
+Console::CursorTop=5;
+printf("Введите минимальную стоимость: ");
+SetConsoleCP(1251);
+Console::CursorLeft=32;
+Console::CursorTop=5;
+scanf("%d", &price);
+SetConsoleCP(866);
+Console::Clear();
+printf("\n                        Игры удовлетворяющие запросам  ");
+printf("\n                                                                                                ");
+printf("\nИгра                             Студия                       Цена/Онлайн"); 
+printf("\n======================================================================================================================="); 
+for (net = spisok2; net != 0; net = net->sled){
+	if (strcmp(net->studioname,vvodstudio)==0){
+		if ((((net->online)>=orn) && ((net->cost)>=price))){
+			printf("\n%-31s   %-18s          %4ld/%-7ld",net->name, net->studioname, net->cost, net->online);}
+	}
+}
+getch();
+
+} 
+
 
