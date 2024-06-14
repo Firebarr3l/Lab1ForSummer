@@ -22,8 +22,6 @@ using namespace System::IO;  // Использование пространства имен System::IO
 
 // Определение глобальных структурных переменных
 struct steamcopy  *steamcopy = NULL;
-//struct sp *spisok = NULL;
-//struct sp2 *spisok2 = NULL;
 
 int menu(int, char [][LENGTHMENU]);
 void vstavka(struct steamcopy*,struct sp** spisok, char *, int);
@@ -161,7 +159,7 @@ getch();
 }
 
 // Функция вставки информации о студиях в связанный список
-void vstavka(struct steamcopy* steamstudio, sp** spisok, char* studioname, int chislostrok) 
+void vstavka(struct steamcopy* steamstudio,struct sp** spisok, char* studioname, int chislostrok) 
 { 
 int i; 
 struct sp *nov,*nt,*z=0; 
@@ -185,7 +183,7 @@ return;
 }
 
 // Функция вставки информации об играх в связанный список
-void vstavkagames(struct steamcopy* steamgames,sp2** spisok2, char* name, int chislostrok) 
+void vstavkagames(struct steamcopy* steamgames,struct sp2** spisok2, char* name, int chislostrok) 
 { 
 int i; 
 struct sp2 *nov,*nt,*z=0; 
@@ -492,9 +490,9 @@ printf("\n");
 printf("\n");
 printf("\n");
 printf("\nДля перехода на следующую страницу нажмите ENTER                                                                    "); 
-getch();
 struct sp *spisok = nullptr;
 struct sp2 *spisok2 = nullptr;
+getch();
 while (1)  {  
 	Console::ForegroundColor = ConsoleColor::Yellow;  
 	Console::BackgroundColor = ConsoleColor::DarkGray;  
