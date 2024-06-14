@@ -22,21 +22,21 @@ using namespace System::IO;  // Использование пространства имен System::IO
 
 // Определение глобальных структурных переменных
 struct steamcopy  *steamcopy = NULL;
-struct sp *spisok = NULL;
-struct sp2 *spisok2 = NULL;
+//struct sp *spisok = NULL;
+//struct sp2 *spisok2 = NULL;
 
 int menu(int, char [][LENGTHMENU]);
-void vstavka(struct steamcopy*,char *, int);
-void vstavkagames(struct steamcopy*, char *, int);
-void alfalistgames(struct steamcopy*, int);
-void alfalist(struct steamcopy*, int);
+void vstavka(struct steamcopy*,struct sp** spisok, char *, int);
+void vstavkagames(struct steamcopy*,struct sp2** spisok2, char *, int);
+void alfalistgames(struct steamcopy*,struct sp2** spisok2, int);
+void alfalist(struct steamcopy*,struct sp** spisok, int);
 void text_data(char *,char *);
 void minn(struct steamcopy*, int);
 void oldest(struct steamcopy*, int);
 void kolvoigr(struct steamcopy*, int);
-void listing(struct sp2*, int);
-void diagramstudio(struct steamcopy*, int);
-void diagramgames(struct steamcopy*, int);
+void listing(struct sp2*,struct sp2** spisok2, int);
+void diagramstudio(struct steamcopy*,struct sp** spisok, int);
+void diagramgames(struct steamcopy*,struct sp2** spisok2, int);
 void CompereCostofgames(struct steamcopy*, int);
 
 // Определение структуры steamcopy
@@ -161,11 +161,11 @@ getch();
 }
 
 // Функция вставки информации о студиях в связанный список
-void vstavka(struct steamcopy* steamstudio,char* studioname, int chislostrok) 
+void vstavka(struct steamcopy* steamstudio, sp** spisok, char* studioname, int chislostrok) 
 { 
 int i; 
 struct sp *nov,*nt,*z=0; 
-for(nt=spisok; nt!=0 && strcmp(nt->studioname,studioname)<0; z=nt, nt=nt->sled); 
+for(nt=*spisok; nt!=0 && strcmp(nt->studioname,studioname)<0; z=nt, nt=nt->sled); 
 if(nt && strcmp(nt->studioname,studioname)==0) return; 
 nov=(struct sp *) malloc(sizeof(struct sp)); 
 strcpy(nov->studioname,studioname); 
@@ -178,18 +178,18 @@ for(i=0;i<chislostrok;i++){
 		nov->prodcopy+=steamstudio[i].prodcopy;
 		nov->online+=steamstudio[i].online;}
 }
-if(!z) spisok=nov; 
+if(!z) *spisok=nov; 
 if(z) z->sled=nov; 
 if(nt) nt->pred=nov; 
 return; 
 }
 
 // Функция вставки информации об играх в связанный список
-void vstavkagames(struct steamcopy* steamgames,char* name, int chislostrok) 
+void vstavkagames(struct steamcopy* steamgames,sp2** spisok2, char* name, int chislostrok) 
 { 
 int i; 
 struct sp2 *nov,*nt,*z=0; 
-for(nt=spisok2; nt!=0 && strcmp(nt->name,name)<0; z=nt, nt=nt->sled); 
+for(nt=*spisok2; nt!=0 && strcmp(nt->name,name)<0; z=nt, nt=nt->sled); 
 if(nt && strcmp(nt->name,name)==0) return; 
 nov=(struct sp2 *) malloc(sizeof(struct sp2)); 
 strcpy(nov->name,name); 
@@ -208,13 +208,13 @@ for(i=0;i<chislostrok;i++){
 		strcat(nov->studioname, steamgames[i].studioname);
 		strcat(nov->data, steamgames[i].data);}
 }
-if(!z) spisok2=nov; 
+if(!z) *spisok2=nov; 
 if(z) z->sled=nov; 
 if(nt) nt->pred=nov; 
 return; 
 }
 // Функция отображения алфавитного списка игр и их информации
-void alfalistgames(struct steamcopy* steam, int chislostrok)
+void alfalistgames(struct steamcopy* steam,struct sp2** spisok2, int chislostrok)
 {
 int i;
 char s[17];
@@ -222,16 +222,16 @@ struct sp2 *nt;
 Console::ForegroundColor=ConsoleColor::Yellow;
 Console::BackgroundColor=ConsoleColor::DarkMagenta;
 Console::Clear();
-if(!spisok2){
+if(!*spisok2){
 	for(i=0;i<chislostrok;i++){
-		vstavkagames(steam,steam[i].name, chislostrok);}
+		vstavkagames(steam,spisok2 ,steam[i].name, chislostrok);}
 }
 Console::Clear();
 printf("\n \t\t\t\t\t\tАлфавитный список игр");
 printf("\n ======================================================================================================================");
 printf("\n Название игры                    Цена       Онлайн     Прод. копии    Название студии           Дата");
 printf("\n ======================================================================================================================");
-for(nt=spisok2; nt!=0; nt=nt->sled){
+for(nt=*spisok2; nt!=0; nt=nt->sled){
 	text_data(s,nt->data);
 	printf("\n %-31s %5ld %12ld %15ld    %-18s   %-17s",nt->name,nt->cost,nt->online, nt->prodcopy, nt->studioname, s);}
 getch();
@@ -241,7 +241,7 @@ getch();
 
 
 // Функция отображения алфавитного и обратного списка студий и суммарное кол-во проданных копий игр этой студии
-void alfalist(struct steamcopy* steam,int chislostrok)
+void alfalist(struct steamcopy* steam,struct sp** spisok, int chislostrok)
 {
 int i;
 struct sp *nt,*z;
@@ -251,13 +251,13 @@ Console::Clear();
 printf("\n    Алфавитный список студий");
 printf(" \t\t\t\t   Обратный алфавитный список студий");
 printf("\n========================================================================================================================");
-if(!spisok){
+if(!*spisok){
 	for(i=0;i<chislostrok;i++){
-		vstavka(steam,steam[i].studioname, chislostrok);}
+		vstavka(steam,spisok, steam[i].studioname, chislostrok);}
 }
-for(nt=spisok; nt!=0; nt=nt->sled){
+for(nt=*spisok; nt!=0; nt=nt->sled){
 	printf("\n %-20s %10ld",nt->studioname,nt->prodcopy);}
-for(nt=spisok,z=0; nt!=0; z=nt,nt=nt->sled);{
+for(nt=*spisok,z=0; nt!=0; z=nt,nt=nt->sled);{
 	Console::CursorTop=3;
 	for(nt=z; nt!=0; nt=nt->pred){
 		Console::CursorLeft=60;
@@ -268,14 +268,14 @@ getch();
 }
 
 //Поиск игр по названию студии минимальному количеству онлайна и цены
-void listing(struct steamcopy* steam,int chislostrok) 
+void listing(struct steamcopy* steam, struct sp2** spisok2, int chislostrok) 
 { 
 int orn, price, i; 
 char vvodstudio[18];
 struct sp2 *net;
-if(!spisok2){
+if(!*spisok2){
 	for(i=0;i<chislostrok;i++){
-		vstavkagames(steam,steam[i].name, chislostrok);}
+		vstavkagames(steam,spisok2,steam[i].name, chislostrok);}
 }
 Console::Clear();
 Console::ForegroundColor=ConsoleColor::Yellow; 
@@ -310,7 +310,7 @@ printf("\n                        Игры удовлетворяющие запросам  ");
 printf("\n                                                                                                ");
 printf("\nИгра                             Студия                       Цена/Онлайн"); 
 printf("\n======================================================================================================================="); 
-for (net = spisok2; net != 0; net = net->sled){
+for (net = *spisok2; net != 0; net = net->sled){
 	if (strcmp(net->studioname,vvodstudio)==0){
 		if ((((net->online)>=orn) && ((net->cost)>=price))){
 			printf("\n%-31s   %-18s          %4ld/%-7ld",net->name, net->studioname, net->cost, net->online);}
@@ -322,7 +322,7 @@ getch();
 
 
 //Функция отображающая диаграмму проданных копий по студии
-void diagramstudio(struct steamcopy *steam, int chislostrok)
+void diagramstudio(struct steamcopy *steam,struct sp** spisok, int chislostrok)
 {
 struct sp* nt;
 int len,i,NColor;
@@ -336,14 +336,14 @@ Console::ForegroundColor=ConsoleColor::Yellow;
 Console::BackgroundColor=ConsoleColor::DarkMagenta;
 Console::Clear();
 for(i=0;i<chislostrok;i++)copy = copy+steam[i].prodcopy;
-if(!spisok){
+if(!*spisok){
 	for(i=0;i<chislostrok;i++){
-		vstavka(steam, steam[i].studioname, chislostrok);}
+		vstavka(steam,spisok, steam[i].studioname, chislostrok);}
 }
 printf("          Диаграмма проданных копий игр определенной студии");
 printf("\n============================================================================");
 Color=ConsoleColor::DarkYellow; NColor=7;
-for(nt=spisok,i=1; nt!=0; nt=nt->sled,i++){
+for(nt=*spisok,i=1; nt!=0; nt=nt->sled,i++){
 sprintf(str1,"%s",nt->studioname);
 sprintf(str2,"%3.1f%%",(nt->prodcopy*100./copy));
 Console::ForegroundColor=ConsoleColor::Yellow;
@@ -366,7 +366,7 @@ return ;
 
 
 //Функция отображающая процентное соотношения онлайна в играх
-void diagramgames(struct steamcopy *steam,int chislostrok) 
+void diagramgames(struct steamcopy *steam,struct sp2** spisok2,int chislostrok) 
 { 
 struct sp2* nt; 
 int len,i,NColor; 
@@ -380,21 +380,21 @@ Console::BackgroundColor=ConsoleColor::DarkMagenta;
 Console::Clear(); 
 for(i=0;i<chislostrok;i++) sum1 = sum1+steam[i].online; 
 sum=sum1/chislostrok; 
-if(!spisok2){ 
+if(!*spisok2){ 
 	for(i=0;i<chislostrok;i++){ 
-		vstavkagames(steam,steam[i].name, chislostrok);}
+		vstavkagames(steam,spisok2,steam[i].name, chislostrok);}
 }
 Color=ConsoleColor::DarkYellow; NColor=7; 
 Console::BackgroundColor=ConsoleColor::DarkMagenta; 
 Console::ForegroundColor=ConsoleColor::Cyan; 
 printf("Cр. знач. онлайна в играх (%d)   100%%  ",sum);
 Console::BackgroundColor=ConsoleColor::Cyan; 
-Console::CursorLeft=55; 
+Console::CursorLeft=44; 
 for(len=0; len<25; len++)printf(" ");
 Console::BackgroundColor=ConsoleColor::DarkMagenta; 
 Console::ForegroundColor=ConsoleColor::Yellow;
 printf("\n========================================================================================================================================================================="); 
-for(nt=spisok2,i=1; nt!=0; nt=nt->sled,i++) { 
+for(nt=*spisok2,i=1; nt!=0; nt=nt->sled,i++) { 
 sprintf(str1,"%s",nt->name); 
 sprintf(str2,"%3.1f%%",(nt->online*100./sum)); 
 Console::ForegroundColor=ConsoleColor::Yellow; 
@@ -493,6 +493,8 @@ printf("\n");
 printf("\n");
 printf("\nДля перехода на следующую страницу нажмите ENTER                                                                    "); 
 getch();
+struct sp *spisok = nullptr;
+struct sp2 *spisok2 = nullptr;
 while (1)  {  
 	Console::ForegroundColor = ConsoleColor::Yellow;  
 	Console::BackgroundColor = ConsoleColor::DarkGray;  
@@ -514,11 +516,11 @@ switch (n) {
 	case 1: minn(steam, chislostrok); break;//Использование функций(подпрограмм описаных в начале  
 	case 2: oldest(steam, chislostrok);break;  
 	case 3: kolvoigr(steam,chislostrok);break;  
-	case 4: alfalist(steam, chislostrok);break;  
-	case 5: alfalistgames(steam, chislostrok);break;  
-	case 6: listing(steam, chislostrok);break;
-	case 7: diagramgames(steam, chislostrok);break;
-	case 8: diagramstudio(steam, chislostrok);break;
+	case 4: alfalist(steam,&spisok, chislostrok);break;  
+	case 5: alfalistgames(steam,&spisok2, chislostrok);break;  
+	case 6: listing(steam,&spisok2, chislostrok);break;
+	case 7: diagramgames(steam,&spisok2, chislostrok);break;
+	case 8: diagramstudio(steam,&spisok, chislostrok);break;
 	case 9: CompereCostofgames(steam, chislostrok); break;
 	case 10:{Console::CursorLeft=0; 
 Console::BackgroundColor=ConsoleColor::Black; 
